@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase'
+import { dbAdmin } from '@/lib/firebaseAdmin'
 
 function isAdmin(req) {
   return req.headers.get('x-admin-key') === process.env.ADMIN_PASSWORD
@@ -7,20 +7,31 @@ function isAdmin(req) {
 // GET — fetch all visibility overrides
 export async function GET(req) {
   if (!isAdmin(req)) return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  const db = supabaseAdmin()
-  const { data } = await db.from('products_override').select('*')
-  return Response.json({ overrides: data || [] })
+  try {
+    const snapshot = await dbAdmin.collection('products_override').get()
+    const overrides = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+    return Response.json({ overrides: overrides || [] })
+  } catch (error) {
+    return Response.json({ error: error.message }, { status: 500 })
+  }
 }
 
 // POST — upsert a product override (toggle visible, update availability note)
 export async function POST(req) {
   if (!isAdmin(req)) return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  const body = await req.json()
-  const db = supabaseAdmin()
-  const { data, error } = await db
-    .from('products_override')
-    .upsert({ ...body, updated_at: new Date().toISOString() })
-    .select().single()
-  if (error) return Response.json({ error: error.message }, { status: 500 })
-  return Response.json({ override: data })
+  try {
+    const body = await req.json()
+    const { id, ...rest } = body
+    if (!id) return Response.json({ error: 'ID required' }, { status: 400 })
+
+    await dbAdmin.collection('products_override').doc(id).set({
+      ...rest,
+      updated_at: new Date().toISOString()
+    }, { merge: true })
+
+    const updated = await dbAdmin.collection('products_override').doc(id).get()
+    return Response.json({ override: { id: updated.id, ...updated.data() } })
+  } catch (error) {
+    return Response.json({ error: error.message }, { status: 500 })
+  }
 }

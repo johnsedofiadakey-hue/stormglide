@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase'
+import { dbAdmin } from '@/lib/firebaseAdmin'
 import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
@@ -13,15 +13,21 @@ export async function POST(request) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Save to Supabase
-    const db = supabaseAdmin()
-    const { data, error } = await db
-      .from('quotes')
-      .insert([{ name, company, email, phone, product_id, product_name, quantity, message, service_type }])
-      .select()
-      .single()
-
-    if (error) throw error
+    // Save to Firestore
+    const quoteRef = await dbAdmin.collection('quotes').add({
+      name,
+      company,
+      email,
+      phone,
+      product_id: product_id || '',
+      product_name,
+      quantity: quantity || '',
+      message: message || '',
+      service_type: service_type || 'product',
+      status: 'new',
+      admin_notes: '',
+      created_at: new Date().toISOString()
+    })
 
     // Send email notification to STORMGLIDE admin
     await resend.emails.send({
@@ -83,7 +89,7 @@ export async function POST(request) {
       `,
     })
 
-    return Response.json({ success: true, id: data.id })
+    return Response.json({ success: true, id: quoteRef.id })
 
   } catch (err) {
     console.error('Quote API error:', err)
