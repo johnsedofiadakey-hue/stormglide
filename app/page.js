@@ -1,7 +1,7 @@
+import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import QuoteForm from '@/components/QuoteForm'
-import Link from 'next/link'
 
 export default function HomePage() {
   return (

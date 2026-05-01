@@ -1,7 +1,7 @@
 'use client'
+import Link from 'next/link'
 import { useState, useEffect, useCallback } from 'react'
 import { products } from '@/lib/data/products'
-import Link from 'next/link'
 
 const ADMIN_KEY_STORAGE = 'sg_admin_key'
 

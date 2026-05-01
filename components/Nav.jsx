@@ -1,6 +1,6 @@
 'use client'
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)

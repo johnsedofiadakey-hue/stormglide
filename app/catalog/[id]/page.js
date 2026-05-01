@@ -1,10 +1,10 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import CertBadge from '@/components/CertBadge'
 import QuoteForm from '@/components/QuoteForm'
 import { getProduct, products } from '@/lib/data/products'
-import Link from 'next/link'
 
 export async function generateStaticParams() {
   return products.map(p => ({ id: p.id }))

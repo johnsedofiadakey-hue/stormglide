@@ -1,5 +1,4 @@
-import Link from 'next/link'
-import CertBadge from './CertBadge'
+import Link from 'next/link';import CertBadge from './CertBadge'
 
 const ICONS = {
   chem: '🧪',

@@ -1,5 +1,4 @@
-import Link from 'next/link'
-
+import Link from 'next/link';
 export default function Footer() {
   return (
     <footer className="bg-navy border-t border-border px-[5vw] pt-14 pb-8">
